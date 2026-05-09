@@ -6,9 +6,10 @@ class PlaylistService {
   final audio_query.OnAudioQuery _audioQuery = audio_query.OnAudioQuery();
 
   Future<List<SongModel>> getAllSongs() async {
-    final List<SongModel> result = [];
+    final Map<String, SongModel> songsMap = {};
 
     try {
+      // 1. Query from MediaStore (indexed by system)
       final List<audio_query.SongModel> audioList =
       await _audioQuery.querySongs(
         sortType: audio_query.SongSortType.TITLE,
@@ -17,66 +18,58 @@ class PlaylistService {
         ignoreCase: true,
       );
 
-      result.addAll(
-        audioList.map((audio) {
-          return SongModel(
-            id: audio.id.toString(),
-            title: audio.title,
-            artist: audio.artist ?? 'Unknown Artist',
-            album: audio.album,
-            filePath: audio.data,
-            duration: Duration(milliseconds: audio.duration ?? 0),
-            albumArt: null,
-            fileSize: audio.size,
-          );
-        }),
-      );
+      for (var audio in audioList) {
+        final song = SongModel(
+          id: audio.id.toString(),
+          title: audio.title,
+          artist: audio.artist ?? 'Unknown Artist',
+          album: audio.album,
+          filePath: audio.data,
+          duration: Duration(milliseconds: audio.duration ?? 0),
+          albumArt: null,
+          fileSize: audio.size,
+        );
+        songsMap[song.filePath] = song;
+      }
     } catch (_) {}
 
-    if (result.isEmpty) {
-      result.addAll(await _loadSongsFromFolder('/storage/emulated/0/Music'));
-      result.addAll(await _loadSongsFromFolder('/sdcard/Music'));
-      result.addAll(await _loadSongsFromFolder('/storage/emulated/0/Download'));
-      result.addAll(await _loadSongsFromFolder('/sdcard/Download'));
+    // 2. Manual scan common folders (to catch newly added files not yet indexed)
+    final foldersToScan = [
+      '/storage/emulated/0/Music',
+      '/storage/emulated/0/Download',
+      '/sdcard/Music',
+      '/sdcard/Download',
+    ];
+
+    for (var path in foldersToScan) {
+      final dir = Directory(path);
+      if (await dir.exists()) {
+        try {
+          final files = dir.listSync(recursive: true).whereType<File>().where((file) {
+            final ext = file.path.toLowerCase();
+            return ext.endsWith('.mp3') || ext.endsWith('.m4a') || ext.endsWith('.wav');
+          });
+
+          for (var file in files) {
+            if (!songsMap.containsKey(file.path)) {
+              final name = file.path.split('/').last.split('.').first;
+              songsMap[file.path] = SongModel(
+                id: file.path,
+                title: name,
+                artist: 'Unknown Artist',
+                album: 'Local',
+                filePath: file.path,
+                duration: Duration.zero,
+                albumArt: null,
+                fileSize: await file.length(),
+              );
+            }
+          }
+        } catch (_) {}
+      }
     }
 
-    return result;
-  }
-
-  Future<List<SongModel>> _loadSongsFromFolder(String folderPath) async {
-    final folder = Directory(folderPath);
-
-    if (!await folder.exists()) {
-      return [];
-    }
-
-    final files = folder
-        .listSync()
-        .whereType<File>()
-        .where((file) {
-      final path = file.path.toLowerCase();
-      return path.endsWith('.mp3') ||
-          path.endsWith('.m4a') ||
-          path.endsWith('.wav') ||
-          path.endsWith('.flac') ||
-          path.endsWith('.ogg');
-    })
-        .toList();
-
-    return files.map((file) {
-      final name = file.path.split('/').last;
-
-      return SongModel(
-        id: file.path,
-        title: name.replaceAll('.mp3', ''),
-        artist: 'Unknown Artist',
-        album: 'Local Music',
-        filePath: file.path,
-        duration: Duration.zero,
-        albumArt: null,
-        fileSize: file.lengthSync(),
-      );
-    }).toList();
+    return songsMap.values.toList();
   }
 
   Future<List<SongModel>> getSongsByArtist(String artist) async {

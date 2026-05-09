@@ -42,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
                       style: TextStyle(color: AppColors.textPrimary(context)),
                     ),
                     subtitle: Slider(
-                      value: 1.0,
+                      value: provider.volume,
                       activeColor: AppColors.primary,
                       inactiveColor: Colors.grey,
                       onChanged: (val) {

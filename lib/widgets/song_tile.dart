@@ -9,23 +9,20 @@ import '../utils/constants.dart';
 class SongTile extends StatelessWidget {
   final SongModel song;
   final VoidCallback onTap;
+  final String? playlistId; // Thêm biến này để biết bài hát đang thuộc playlist nào
 
   const SongTile({
     super.key,
     required this.song,
     required this.onTap,
+    this.playlistId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding:
-      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-
-      /// Album Art
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: _buildAlbumArt(context),
-
-      /// Title
       title: Text(
         song.title,
         style: TextStyle(
@@ -35,8 +32,6 @@ class SongTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-
-      /// Artist
       subtitle: Text(
         song.artist,
         style: TextStyle(
@@ -45,8 +40,6 @@ class SongTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-
-      /// Menu
       trailing: IconButton(
         icon: Icon(
           Icons.more_vert,
@@ -56,7 +49,6 @@ class SongTile extends StatelessWidget {
           _showOptionsMenu(context);
         },
       ),
-
       onTap: onTap,
     );
   }
@@ -71,16 +63,16 @@ class SongTile extends StatelessWidget {
       ),
       child: song.albumArt != null
           ? ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.file(
-          File(song.albumArt!),
-          fit: BoxFit.cover,
-        ),
-      )
+              borderRadius: BorderRadius.circular(4),
+              child: Image.file(
+                File(song.albumArt!),
+                fit: BoxFit.cover,
+              ),
+            )
           : Icon(
-        Icons.music_note,
-        color: AppColors.textSecondary(context),
-      ),
+              Icons.music_note,
+              color: AppColors.textSecondary(context),
+            ),
     );
   }
 
@@ -88,43 +80,44 @@ class SongTile extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.cardBackground(context),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(
-                Icons.playlist_add,
-                color: AppColors.textPrimary(context),
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.playlist_add, color: AppColors.textPrimary(context)),
+                title: Text('Thêm vào playlist', style: TextStyle(color: AppColors.textPrimary(context))),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showPlaylistPicker(context);
+                },
               ),
-              title: Text(
-                'Add to playlist',
-                style: TextStyle(
-                  color: AppColors.textPrimary(context),
+              if (playlistId != null) // Hiện nút xóa nếu đang ở trong Playlist
+                ListTile(
+                  leading: const Icon(Icons.playlist_remove, color: Colors.red),
+                  title: const Text('Xóa khỏi playlist này', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    context.read<PlaylistProvider>().removeSongFromPlaylist(playlistId!, song.id);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Đã xóa "${song.title}" khỏi playlist')),
+                    );
+                  },
                 ),
+              ListTile(
+                leading: Icon(Icons.info_outline, color: AppColors.textPrimary(context)),
+                title: Text('Thông tin bài hát', style: TextStyle(color: AppColors.textPrimary(context))),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showSongInfo(context);
+                },
               ),
-              onTap: () {
-                Navigator.pop(context);
-                _showPlaylistPicker(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.info_outline,
-                color: AppColors.textPrimary(context),
-              ),
-              title: Text(
-                'Song info',
-                style: TextStyle(
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                _showSongInfo(context);
-              },
-            ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -151,34 +144,13 @@ class SongTile extends StatelessWidget {
             final playlist = playlists[index];
 
             return ListTile(
-              leading: Icon(
-                Icons.queue_music,
-                color: AppColors.textPrimary(context),
-              ),
-              title: Text(
-                playlist.name,
-                style: TextStyle(
-                  color: AppColors.textPrimary(context),
-                ),
-              ),
-              subtitle: Text(
-                '${playlist.songIds.length} songs',
-                style: TextStyle(
-                  color: AppColors.textSecondary(context),
-                ),
-              ),
+              leading: Icon(Icons.queue_music, color: AppColors.textPrimary(context)),
+              title: Text(playlist.name, style: TextStyle(color: AppColors.textPrimary(context))),
               onTap: () async {
-                await context
-                    .read<PlaylistProvider>()
-                    .addSongToPlaylist(playlist.id, song.id);
-
+                await context.read<PlaylistProvider>().addSongToPlaylist(playlist.id, song.id);
                 Navigator.pop(context);
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                    Text('Đã thêm "${song.title}" vào playlist'),
-                  ),
+                  SnackBar(content: Text('Đã thêm vào "${playlist.name}"')),
                 );
               },
             );
@@ -194,19 +166,10 @@ class SongTile extends StatelessWidget {
       builder: (_) {
         return AlertDialog(
           backgroundColor: AppColors.cardBackground(context),
-          title: Text(
-            'Song info',
-            style: TextStyle(
-              color: AppColors.textPrimary(context),
-            ),
-          ),
+          title: Text('Thông tin bài hát', style: TextStyle(color: AppColors.textPrimary(context))),
           content: Text(
-            'Title: ${song.title}\n'
-                'Artist: ${song.artist}\n'
-                'Album: ${song.album ?? "Unknown"}',
-            style: TextStyle(
-              color: AppColors.textPrimary(context),
-            ),
+            'Tiêu đề: ${song.title}\nCa sĩ: ${song.artist}\nAlbum: ${song.album ?? "Không rõ"}\nĐường dẫn: ${song.filePath}',
+            style: TextStyle(color: AppColors.textPrimary(context)),
           ),
           actions: [
             TextButton(
@@ -219,4 +182,3 @@ class SongTile extends StatelessWidget {
     );
   }
 }
-

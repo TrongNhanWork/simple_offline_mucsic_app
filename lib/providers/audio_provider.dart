@@ -13,6 +13,7 @@ class AudioProvider extends ChangeNotifier {
   int _currentIndex = 0;
   bool _isShuffleEnabled = false;
   LoopMode _loopMode = LoopMode.off;
+  double _volume = 1.0;
 
   AudioProvider(this._audioService, this._storageService) {
     _init();
@@ -24,6 +25,7 @@ class AudioProvider extends ChangeNotifier {
   SongModel? get currentSong => _playlist.isEmpty ? null : _playlist[_currentIndex];
   bool get isShuffleEnabled => _isShuffleEnabled;
   LoopMode get loopMode => _loopMode;
+  double get volume => _volume;
 
   Stream<Duration> get positionStream => _audioService.positionStream;
   Stream<Duration?> get durationStream => _audioService.durationStream;
@@ -37,8 +39,9 @@ class AudioProvider extends ChangeNotifier {
     _loopMode = LoopMode.values[repeatMode];
     await _audioService.setLoopMode(_loopMode);
 
-    final volume = await _storageService.getVolume();
-    await _audioService.setVolume(volume);
+    _volume = await _storageService.getVolume();
+    await _audioService.setVolume(_volume);
+    notifyListeners();
   }
 
 
@@ -132,6 +135,7 @@ class AudioProvider extends ChangeNotifier {
 
 
   Future<void> setVolume(double volume) async {
+    _volume = volume;
     await _audioService.setVolume(volume);
     await _storageService.saveVolume(volume);
     notifyListeners();

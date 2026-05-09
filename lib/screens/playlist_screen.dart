@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/playlist_provider.dart';
 import '../widgets/playlist_card.dart';
 import '../utils/constants.dart';
+import 'playlist_detail_screen.dart';
 
 class PlaylistScreen extends StatelessWidget {
   const PlaylistScreen({super.key});
@@ -46,7 +47,14 @@ class PlaylistScreen extends StatelessWidget {
 
               return PlaylistCard(
                 playlist: playlist,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PlaylistDetailScreen(playlist: playlist),
+                    ),
+                  );
+                },
                 onDelete: () {
                   provider.deletePlaylist(playlist.id);
                 },
