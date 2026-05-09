@@ -1,16 +1,65 @@
-# simple_offline_mucsic_app
+# Simple Offline Music App
 
-A new Flutter project.
+Ứng dụng nghe nhạc offline được xây dựng bằng Flutter.  
+App cho phép phát nhạc từ thiết bị, quản lý playlist, tua bài hát, chuyển bài và thay đổi giao diện sáng/tối.
 
-## Getting Started
+---
+Link demo ứng dụng: https://drive.google.com/drive/folders/182zSeIIn_Pkpgn2hE05TrJbZszyfH4bd?usp=sharing
+---
+# Công nghệ sử dụng
 
-This project is a starting point for a Flutter application.
+- Flutter
+- Dart
+- Provider
+- just_audio
+- audio_service
+- on_audio_query
+- shared_preferences
+- permission_handler
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+# Chức năng chính
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Phát nhạc offline từ thiết bị
+- Tạm dừng / tiếp tục bài hát
+- Chuyển bài trước / sau
+- Thanh tua bài hát
+- Hiển thị danh sách bài hát
+- Tạo playlist
+- Chế độ Shuffle / Repeat
+- Dark Mode
+- Mini Player
+
+---
+
+
+
+---
+
+# Các màn hình của ứng dụng
+
+## Màn hình Home
+
+![Home](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/1.png)
+
+---
+
+## Danh sách bài hát
+
+![Songs](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/2.png)
+
+---
+
+## Màn hình phát nhạc
+
+![Now Playing](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/3.png)
+
+---
+
+## Playlist và Settings
+
+![Playlist](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/4.png)
+
+---
+
