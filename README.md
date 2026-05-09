@@ -51,13 +51,13 @@ Link demo ứng dụng: https://drive.google.com/drive/folders/182zSeIIn_Pkpgn2h
 
 ---
 
-## Màn hình phát nhạc
+## Màn hình các bài hát trong Playlist
 
 ![Now Playing](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/3.png)
 
 ---
 
-## Playlist và Settings
+## Màn hình Settings
 
 ![Playlist](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/4.png)
 
