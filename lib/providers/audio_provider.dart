@@ -107,6 +107,20 @@ class AudioProvider extends ChangeNotifier {
     await _audioService.seek(position);
   }
 
+  /// Tua nhanh hoặc lùi lại một khoảng thời gian
+  Future<void> seekRelative(Duration offset) async {
+    final newPosition = _audioService.currentPosition + offset;
+    final duration = _audioService.currentDuration ?? Duration.zero;
+    
+    if (newPosition < Duration.zero) {
+      await _audioService.seek(Duration.zero);
+    } else if (newPosition > duration) {
+      await next();
+    } else {
+      await _audioService.seek(newPosition);
+    }
+  }
+
 
   Future<void> toggleShuffle() async {
     _isShuffleEnabled = !_isShuffleEnabled;
