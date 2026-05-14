@@ -63,3 +63,14 @@ Link demo ứng dụng: https://drive.google.com/drive/folders/182zSeIIn_Pkpgn2h
 
 ---
 
+## Mini Player
+
+![Mini Player](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/Mini_Player.jpg)
+
+---
+
+## Dark Mode
+
+![Dark Mode](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/Dark_Mode.jpg)
+
+---
