@@ -74,3 +74,9 @@ Link demo ứng dụng: https://drive.google.com/drive/folders/182zSeIIn_Pkpgn2h
 ![Dark Mode](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/Dark_Mode.jpg)
 
 ---
+
+## Now Playing
+
+![Now Playing](https://raw.githubusercontent.com/TrongNhanWork/simple_offline_mucsic_app/main/now_playing.jpg)
+
+---
